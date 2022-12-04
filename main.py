@@ -23,21 +23,6 @@ def proxy_switch():
 def get_page(url,driver,fast_exit=False,attemps=0):
 	driver.get(url)
 	sleep(5)
-	#test(driver.page_source,'test.html','w')
-
-	#if 'Доступ с вашего IP-адреса временно ограничен' in driver.page_source:
-	#	print('смена прокси')
-	#	driver.delete_all_cookies()
-		#input()
-	#	proxy_switch()
-	#	update_cookie(driver)
-	#	return get_page(url,driver,attemps=attemps+1)
-	
-	#if fast_exit:
-	#	return
-
-	#if attemps > 30:
-	#	return None
 	
 	soup = bs(driver.page_source,'html.parser')
 	#driver.back()
@@ -46,9 +31,14 @@ def get_page(url,driver,fast_exit=False,attemps=0):
 	return soup
 
 
+def test(content,name):
+	with open(name,'w',encoding='utf-8') as f:
+		f.write(content)
+
+
 def parse_item():
 	soup = bs(driver.page_source,'html.parser')
-	
+	test(driver.page_source,'test.html')
 	title = '<b>'+soup.find('h1').text+'</b>'
 	description = soup.find('div','style-item-description-pL_gy').text.replace('Описание',' ')
 	if len(description) > 800:
@@ -72,8 +62,9 @@ def parse():
 	while True:
 		for i in range(2):
 			driver.get(parse_links[i])
+			print(parse_links[i])
 			items = driver.find_elements(By.XPATH,'//div[@data-marker="item"]')
-
+			test(driver.page_source,'test.html')
 			for i in range(len(items)):
 				item = items[i]
 				soup = bs(item.get_attribute('innerHTML'),'html.parser')
@@ -93,6 +84,7 @@ def parse():
 						continue
 
 					driver.get(link)
+					print(link)
 					content = driver.find_element(By.XPATH,'//li[@class="params-paramsList__item-appQw"]').text
 					links.append(link)
 
@@ -127,7 +119,10 @@ def send_message(text,photo,link):
 				
 
 if __name__ == '__main__':
-	driver = uc.Chrome()
+	options = uc.ChromeOptions()
+	options.headless=True
+	options.add_argument('--headless')
+	driver = uc.Chrome(options=options)
 	driver.implicitly_wait(30)
 	parse()
 
