@@ -61,20 +61,25 @@ def parse():
 	links = []
 	with open('key_words.txt','r') as file:
 		key_words = file.read().splitlines()
-	parse_links = ['https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=99&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232360&display=list&limit=25&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60MjYyMjG3rgUEAAD__6Us-7UhAAAA&presentationType=serp','https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=40&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232000&display=list&limit=25&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60sjQxNze3rgUEAAD__2iwhx0hAAAA&presentationType=serp']
+	parse_links = ['https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=99&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232360&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60MjYyMjG3rgUEAAD__6Us-7UhAAAA&presentationType=serp','https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=40&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232000&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60sjQxNze3rgUEAAD__2iwhx0hAAAA&presentationType=serp']
 	
 	while True:
 		for i in range(2):
-			data = get_page(parse_links[i])
-			test(str(json.dumps(data)),'test.html')
-			items = data['result']['items']
+			page = 1
 			
-			for i in range(len(items)):
-				item = items[i]['value']
-				title = item['title']
-				date = (datetime.now() - datetime.fromtimestamp(item['time'])).seconds // 60
-				print(title,date)
-				if date <= 10:
+			while True:
+				url = parse_links[i].replace('page=1','page='+str(page))
+				data = get_page(url)
+				test(str(json.dumps(data)),'test.html')
+				items = data['result']['items']
+				
+				for item in items:
+					item = item['value']
+					title = item['title']
+					date = (datetime.now() - datetime.fromtimestamp(item['time'])).seconds // 60
+					print(title,date)
+					if date >= 5:
+						break
 					link = 'https://www.avito.ru'+item['uri_mweb']
 					for key_word in key_words:
 						if key_word.lower() in title.lower():
@@ -92,6 +97,13 @@ def parse():
 					send_message(text,photo,link)
 					
 					links.append(link)
+				
+				page += 1
+
+				if date >= 5:
+					break
+				
+				sleep(10)
 
 			sleep(3)
 		sleep(60*3)
