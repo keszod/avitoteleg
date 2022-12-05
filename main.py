@@ -8,7 +8,6 @@ import requests
 import ssl
 import urllib.parse
 from datetime import datetime
-from bs4 import BeautifulSoup as bs
 from time import sleep
 
 from requests.adapters import HTTPAdapter
@@ -100,7 +99,7 @@ def parse():
 				
 				page += 1
 
-				if date >= 5:
+				if date >= 4:
 					break
 				
 				sleep(10)
