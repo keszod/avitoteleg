@@ -60,6 +60,7 @@ def parse():
 	links = []
 	with open('key_words.txt','r') as file:
 		key_words = file.read().splitlines()
+	
 	parse_links = ['https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=99&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232360&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60MjYyMjG3rgUEAAD__6Us-7UhAAAA&presentationType=serp','https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=40&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232000&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60sjQxNze3rgUEAAD__2iwhx0hAAAA&presentationType=serp']
 	
 	while True:
@@ -102,7 +103,7 @@ def parse():
 				if date >= 4:
 					break
 				
-				sleep(10)
+				sleep(15)
 
 			sleep(3)
 		sleep(60*3)
