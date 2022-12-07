@@ -58,54 +58,40 @@ def test(content,name):
 
 def parse():
 	links = []
-	with open('key_words.txt','r') as file:
+	with open('key_words.txt','r',encoding='utf-8-sig') as file:
 		key_words = file.read().splitlines()
 	
-	parse_links = ['https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=99&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232360&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60MjYyMjG3rgUEAAD__6Us-7UhAAAA&presentationType=serp','https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=40&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232000&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60sjQxNze3rgUEAAD__2iwhx0hAAAA&presentationType=serp']
+	parse_link = 'https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232360&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60MjYyMjG3rgUEAAD__6Us-7UhAAAA&presentationType=serp'
 	
 	while True:
-		for i in range(2):
-			page = 1
+		for key_word in key_words:
+			url = parse_link+'&query='+key_word
+			data = get_page(url)
+			test(str(json.dumps(data)),'test.html')
+			items = data['result']['items']
 			
-			while True:
-				url = parse_links[i].replace('page=1','page='+str(page))
-				data = get_page(url)
-				test(str(json.dumps(data)),'test.html')
-				items = data['result']['items']
-				
-				for item in items:
-					item = item['value']
-					title = item['title']
-					date = (datetime.now() - datetime.fromtimestamp(item['time'])).seconds // 60
-					print(title,date)
-					if date >= 10:
-						break
-					link = 'https://www.avito.ru'+item['uri_mweb']
-					for key_word in key_words:
-						if key_word.lower() in title.lower():
-							break
-					else:
-						continue
-
-					if link in links:
-						continue
-
-					price = item['price']
-					address = item['address']
-					photo = item['galleryItems'][0]['value']['678x678']
-					text = title + '\n\n' + '<b>Адресс</b>: '+address+'\n\n'+'<b>Стоимость</b>: '+price
-					send_message(text,photo,link)
-					
-					links.append(link)
-				
-				page += 1
-
-				if date >= 10:
+			for item in items:
+				item = item['value']
+				title = item['title']
+				date = (datetime.now() - datetime.fromtimestamp(item['time'])).seconds // 60
+				print(title,date)
+				if date >= 60:
 					break
-				
-				sleep(15)
+				link = 'https://www.avito.ru'+item['uri_mweb']
 
-			sleep(3)
+				if link in links:
+					continue
+
+				price = item['price']
+				address = item['address']
+				photo = item['galleryItems'][0]['value']['678x678']
+				text = title + '\n\n' + '<b>Адресс</b>: '+address+'\n\n'+'<b>Стоимость</b>: '+price
+				send_message(text,photo,link)
+				
+				links.append(link)
+			
+			sleep(10)
+
 		sleep(60*3)
 
 def send_message(text,photo,link):
