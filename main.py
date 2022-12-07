@@ -81,6 +81,12 @@ def parse():
 
 				if link in links:
 					continue
+				
+				for key_word in key_words:
+					if key_word in title:
+						break
+				else:
+					continue
 
 				price = item['price']
 				address = item['address']
