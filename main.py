@@ -100,6 +100,7 @@ def parse():
 					
 					sleep(12)
 		except:
+			sleep(60*5)
 			continue
 		sleep(60*5)
 
