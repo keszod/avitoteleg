@@ -57,7 +57,7 @@ def test(content,name):
 		f.write(content)
 
 def parse():
-	links = []
+	ids = []
 	with open('key_words.txt','r',encoding='utf-8-sig') as file:
 		key_words = file.read().splitlines()
 	
@@ -81,7 +81,7 @@ def parse():
 							break
 						link = 'https://www.avito.ru'+item['uri_mweb']
 
-						if link in links:
+						if item['id'] in ids:
 							continue
 						
 						for key_word in key_words:
@@ -95,8 +95,9 @@ def parse():
 						photo = item['galleryItems'][0]['value']['678x678']
 						text = title + '\n\n' + '<b>Адресс</b>: '+address+'\n\n'+'<b>Стоимость</b>: '+price
 						send_message(text,photo,link)
+						send_message(text,photo,link,'618939593')
 						
-						links.append(link)
+						ids.append(item['id'])
 					
 					sleep(12)
 		except:
@@ -104,9 +105,9 @@ def parse():
 			continue
 		sleep(60*5)
 
-def send_message(text,photo,link):
+def send_message(text,photo,link,chat_id='917403306'):
 	token = '934338853:AAHfa6yri8ktKUUtgIRZGaVgKMrn2oB_GLk'
-	chat_id = '917403306'
+	#chat_id = '917403306'
 	#chat_id = '618939593'
 	print(text)
 
