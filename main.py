@@ -75,9 +75,9 @@ def parse():
 					for item in items:
 						item = item['value']
 						title = item['title']
-						date = (datetime.now() - datetime.fromtimestamp(item['time'])).seconds // 60
-						print(title,date)
-						if date >= 60:
+						date = (datetime.now() - datetime.fromtimestamp(item['time']))
+						print(title,date,date.seconds//60)
+						if date.days >= 1 or date.seconds >= 60*60:
 							break
 						link = 'https://www.avito.ru'+item['uri_mweb']
 
@@ -85,7 +85,7 @@ def parse():
 							continue
 						
 						for key_word in key_words:
-							if key_word in link:
+							if key_word in title:
 								break
 						else:
 							continue
