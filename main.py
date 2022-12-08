@@ -85,7 +85,7 @@ def parse():
 							continue
 						
 						for key_word in key_words:
-							if key_word in title:
+							if key_word in link:
 								break
 						else:
 							continue
