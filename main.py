@@ -61,49 +61,56 @@ def parse():
 	with open('key_words.txt','r',encoding='utf-8-sig') as file:
 		key_words = file.read().splitlines()
 	
-	parse_links = ['https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=99&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232360&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60MjYyMjG3rgUEAAD__6Us-7UhAAAA&presentationType=serp','https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&categoryId=40&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232000&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60sjQxNze3rgUEAAD__2iwhx0hAAAA&presentationType=serp']
+	parse_link = 'https://m.avito.ru/api/11/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&locationId=621540&priceMin=20000&sort=date&page=1&lastStamp=1670232360&display=list&limit=100&pageId=H4sIAAAAAAAA_0q0MrSqLrYyNLRSKskvScyJT8svzUtRss60MjYyMjG3rgUEAAD__6Us-7UhAAAA&presentationType=serp'
 
 	while True:
+		categories = ['orgtehnika_i_rashodniki','oborudovanie_dlya_biznesa']
 		try:
-			for parse_link in parse_links:
-				for key_word in key_words:
-					url = parse_link+'&query='+key_word
-					data = get_page(url)
-					test(str(json.dumps(data)),'test.html')
-					items = data['result']['items']
+			for key_word in key_words:
+				url = parse_link+'&query='+key_word
+				data = get_page(url)
+				test(str(json.dumps(data)),'test.html')
+				items = data['result']['items']
+				
+				for item in items:
+					item = item['value']
+					title = item['title']
+					date = (datetime.now() - datetime.fromtimestamp(item['time']))
+					print(title,date,date.seconds//60)
+					if date.days >= 1 or date.seconds >= 60*60:
+						break
+					link = 'https://www.avito.ru'+item['uri_mweb']
+
+					if item['id'] in ids:
+						continue
 					
-					for item in items:
-						item = item['value']
-						title = item['title']
-						date = (datetime.now() - datetime.fromtimestamp(item['time']))
-						print(title,date,date.seconds//60)
-						if date.days >= 1 or date.seconds >= 60*60:
+					for key_word in key_words:
+						if key_word in title:
 							break
-						link = 'https://www.avito.ru'+item['uri_mweb']
+					else:
+						continue
 
-						if item['id'] in ids:
-							continue
-						
-						for key_word in key_words:
-							if key_word in title:
-								break
-						else:
-							continue
+					for category in categories:
+						if category in link:
+							break
 
-						price = item['price']
-						address = item['address']
-						photo = item['galleryItems'][0]['value']['678x678']
-						text = title + '\n\n' + '<b>Адресс</b>: '+address+'\n\n'+'<b>Стоимость</b>: '+price
-						send_message(text,photo,link)
-						send_message(text,photo,link,'618939593')
-						
-						ids.append(item['id'])
+					else:
+						continue
+
+					price = item['price']
+					address = item['address']
+					photo = item['galleryItems'][0]['value']['678x678']
+					text = title + '\n\n' + '<b>Адресс</b>: '+address+'\n\n'+'<b>Стоимость</b>: '+price
+					send_message(text,photo,link)
+					send_message(text,photo,link,'618939593')
 					
-					sleep(12)
+					ids.append(item['id'])
+				
+				sleep(5)
 		except:
-			sleep(60*5)
+			sleep(60*3)
 			continue
-		sleep(60*5)
+		sleep(60*3)
 
 def send_message(text,photo,link,chat_id='917403306'):
 	token = '934338853:AAHfa6yri8ktKUUtgIRZGaVgKMrn2oB_GLk'
